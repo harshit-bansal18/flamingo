@@ -451,6 +451,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
+      _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -465,6 +466,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
+      _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -481,6 +483,7 @@ Mipc::Dec (unsigned int ins)
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
       _regSRC2 = i.reg.rt;
+      _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -495,6 +498,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
+      _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -511,6 +515,7 @@ Mipc::Dec (unsigned int ins)
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
       _regSRC2 = i.reg.rt;
+      _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -525,6 +530,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
       _regSRC1 = i.reg.rs;
+      _hasImm = TRUE;
       _writeREG = FALSE;
       _writeFREG = TRUE;
       _hiWPort = FALSE;
@@ -816,14 +822,59 @@ void
 Mipc::func_mfhi (Mipc *mc, unsigned ins)
 {  
    // Change here, dont read from hi register. Read from bypass register
-   mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_hi;
+#ifdef BYPASS_ENABLED
+   switch (mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
+    {
+    case EX:
+        /* code */
+        fprintf(mc->_debugLog, "bypassing %#x from EX to HI for ins %#x\n", mc->_pipe_regs_live.EX_MEM._opResultHi, ins);
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_live.EX_MEM._opResultHi;
+        break;
+    case MEM:
+        fprintf(mc->_debugLog, "bypassing %#x from MEM to HI for ins %#x\n", mc->_pipe_regs_live.EX_MEM._opResultHi, ins);
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_live.MEM_WB._opResultHi;
+        break;
+    case NONE:
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_hi;
+        break;
+    default:
+        printf("MC YE KAHA SE AA GYA\nFUCKKKKKKKKKKKKKKKKKKKKKKKKK\n");
+        exit(0);
+        break;
+    }
+#else
+    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_hi;
+#endif
+
 }
 
 void
 Mipc::func_mflo (Mipc *mc, unsigned ins)
 {  
    // Change here, dont read from hi register. Read from bypass register
-   mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_lo;
+#ifdef BYPASS_ENABLED
+   switch (mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
+    {
+    case EX:
+        /* code */
+        fprintf(mc->_debugLog, "bypassing %#x from EX to LO for ins %#x\n", mc->_pipe_regs_live.EX_MEM._opResultLo, ins);
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_live.EX_MEM._opResultLo;
+        break;
+    case MEM:
+        fprintf(mc->_debugLog, "bypassing %#x from MEM to LO for ins %#x\n", mc->_pipe_regs_live.EX_MEM._opResultLo, ins);
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_live.MEM_WB._opResultLo;
+        break;
+    case NONE:
+        mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_lo;
+        break;
+    default:
+        printf("MC YE KAHA SE AA GYA\nFUCKKKKKKKKKKKKKKKKKKKKKKKKK\n");
+        exit(0);
+        break;
+    }
+#else
+    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_lo;
+#endif
 }
 
 void
@@ -898,6 +949,7 @@ Mipc::func_jalr (Mipc *mc, unsigned ins)
 {
    mc->_btaken = 1;
    mc->_num_jal++;
+   mc->_pipe_regs_copy.ID_EX._btgt = mc->_pipe_regs_copy.ID_EX._decodedSRC1;
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_copy.ID_EX._pc + 8;
 }
 
@@ -906,6 +958,7 @@ Mipc::func_jr (Mipc *mc, unsigned ins)
 {
    mc->_btaken = 1;
    mc->_num_jr++;
+   mc->_pipe_regs_copy.ID_EX._btgt = mc->_pipe_regs_copy.ID_EX._decodedSRC1;
 }
 
 void
@@ -1236,6 +1289,8 @@ Mipc::mem_lwl (Mipc *mc)
    signed int a1;
    unsigned s1;
 
+    mc->_pipe_regs_copy.EX_MEM._subregOperand = mc->_gpr[mc->_pipe_regs_copy.EX_MEM._rt];
+
    a1 = mc->_mem->BEGetWord (mc->_pipe_regs_copy.EX_MEM._MAR, mc->_mem->Read(mc->_pipe_regs_copy.EX_MEM._MAR & ~(LL)0x7));
    s1 = (mc->_pipe_regs_copy.EX_MEM._MAR & 3) << 3;
    mc->_pipe_regs_copy.EX_MEM._opResultLo = (a1 << s1) | (mc->_pipe_regs_copy.EX_MEM._subregOperand & ~(~0UL << s1));
@@ -1251,6 +1306,8 @@ void
 Mipc::mem_lwr (Mipc *mc)
 {
    unsigned ar1, s1;
+
+    mc->_pipe_regs_copy.EX_MEM._subregOperand = mc->_gpr[mc->_pipe_regs_copy.EX_MEM._rt];
 
    ar1 = mc->_mem->BEGetWord (mc->_pipe_regs_copy.EX_MEM._MAR, mc->_mem->Read(mc->_pipe_regs_copy.EX_MEM._MAR & ~(LL)0x7));
    s1 = (~mc->_pipe_regs_copy.EX_MEM._MAR & 3) << 3;

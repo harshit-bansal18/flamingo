@@ -24,15 +24,20 @@ typedef unsigned Bool;
 #define MIPC_DEBUG 1
 // #define BRANCH_INTERLOCK 1
 
+#define BYPASS_ENABLED 1
+
 #include "mem.h"
 #include "../../common/syscall.h"
 #include "queue.h"
 
-enum BYPASS_SRC {
+
+#ifdef BYPASS_ENABLED
+typedef enum {
     EX = 101,
     MEM = 102,
     NONE = 103
-};
+}BYPASS_SRC;
+#endif
 
 typedef struct
 {
@@ -59,19 +64,16 @@ typedef struct
     Bool _isNoOp;
     Bool _isFloating;
 
+#ifdef BYPASS_ENABLED
     BYPASS_SRC _bypassSrc1;
     BYPASS_SRC _bypassSrc2;
+#endif
+
 } regs;
 
 typedef struct
 {
-    struct
-    {
-        unsigned int _pc;
-        unsigned int _ins;
-        bool _isNoOp;
-    } IF_ID;
-
+    regs IF_ID;
     regs ID_EX;
     regs EX_MEM;
     regs MEM_WB;
@@ -160,7 +162,7 @@ public:
     bool _readLo;
     bool _readHi;
     bool _isFloating;
-
+    bool _hasImm;
     // Simulation statistics counters
 
     LL _nfetched;

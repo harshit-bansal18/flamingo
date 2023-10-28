@@ -9,18 +9,12 @@ Mipc::Mipc(Mem *m) : _l('M')
 
     printf("in mipc constructor\n");
 
-    _pipe_regs_live.EX_MEM._isNoOp = 1;
-    _pipe_regs_live.ID_EX._isNoOp = 1;
-    _pipe_regs_live.IF_ID._isNoOp = 1;
-    _pipe_regs_live.MEM_WB._isNoOp = 1; 
-
     _syscall_in_pipe = false;
 
-
-// #ifdef MIPC_DEBUG
+    // #ifdef MIPC_DEBUG
     _debugLog = fopen("mipc.debug", "w");
     assert(_debugLog != NULL);
-// #endif
+    // #endif
 
     Reboot(ParamGetString("Mipc.BootROM"));
 }
@@ -38,45 +32,24 @@ void Mipc::MainLoop(void)
 
     _nfetched = 0;
 
-    //    while (!_sim_exit) {
-    //      AWAIT_P_PHI0;	// @posedge
-    //      if (_insDone) {
-    //         addr = _pc;
-    //         ins = _mem->BEGetWord (addr, _mem->Read(addr & ~(LL)0x7));
-    //         AWAIT_P_PHI1;	// @negedge
-    // #ifdef MIPC_DEBUG
-    //         fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc);
-    // #endif
-    //         _ins = ins;
-    //         _insValid = TRUE;
-    //         _insDone = FALSE;
-    //         _nfetched++;
-    //         _bd = 0;
-    //      }
-    //      else {
-    //         PAUSE(1);
-    //      }
-    //    }
-
     printf("starting fetch main loop..\n");
     while (!_sim_exit)
     {
         AWAIT_P_PHI0; // @posedge
         // fetch at negegde
         AWAIT_P_PHI1; // @negedge
-        // check for stall signal
         if (_syscall_in_pipe)
         {
             killIF_ID();
             continue;
         }
         else
-        {   
-            // data hazard stall
-            if(_stall)
+        {
+            if (_stall)
                 continue;
 #ifdef BRANCH_INTERLOCK
-            if(_isBranchInterlock) {
+            if (_isBranchInterlock)
+            {
                 killIF_ID();
                 continue;
             }
@@ -88,11 +61,11 @@ void Mipc::MainLoop(void)
             _pipe_regs_live.IF_ID._ins = ins;
             _pipe_regs_live.IF_ID._pc = _pc;
 
-            _pc += 4; // ????
+            _pc += 4;
             _nfetched++;
-// #ifdef MIPC_DEBUG
+#ifdef MIPC_DEBUG
             fprintf(_debugLog, "<%llu> Fetched ins %#x from PC %#x\n", SIM_TIME, ins, _pc - 4);
-// #endif
+#endif
         }
     }
 
@@ -131,7 +104,7 @@ void Mipc::MipcDumpstats()
 
 void Mipc::fake_syscall(unsigned int ins)
 {
-    _sys->pc = _pipe_regs_copy.MEM_WB._pc; // ?? 
+    _sys->pc = _pipe_regs_copy.MEM_WB._pc; // ??
     _sys->quit = 0;
     _sys->EmulateSysCall();
     if (_sys->quit)
@@ -186,12 +159,16 @@ void Mipc::Reboot(char *image)
         _btgt = 0xdeadbeef;
         _sim_exit = 0;
         _syscall_in_pipe = FALSE;
+        _hasImm = FALSE;
 #ifdef BRANCH_INTERLOCK
         _isBranchInterlock = FALSE;
 #endif
         _pipe_regs_live.ID_EX._isIllegalOp = FALSE;
         _pipe_regs_live.EX_MEM._isIllegalOp = FALSE;
         _pipe_regs_live.MEM_WB._isIllegalOp = FALSE;
+        _pipe_regs_live.ID_EX._bypassSrc1 = NONE;
+        _pipe_regs_live.EX_MEM._bypassSrc1 = NONE;
+        _pipe_regs_live.MEM_WB._bypassSrc1 = NONE;
         _pc = ParamGetInt("Mipc.BootPC"); // Boom! GO
     }
 }
@@ -238,8 +215,8 @@ LL MipcSysCall::GetTime(void)
     return SIM_TIME;
 }
 
-
-void Mipc::killID_EX(void) {
+void Mipc::killID_EX(void)
+{
     _pipe_regs_live.ID_EX._ins = 0;
     _pipe_regs_live.ID_EX._isBranchIns = 0;
     _pipe_regs_live.ID_EX._isSyscall = 0;
@@ -254,11 +231,14 @@ void Mipc::killID_EX(void) {
     _pipe_regs_live.ID_EX._writeFREG = FALSE;
     _pipe_regs_live.ID_EX._writeREG = FALSE;
     _pipe_regs_live.ID_EX._memControl = FALSE;
-    _pipe_regs_live.ID_EX._bypassSrc1 = BYPASS_SRC::NONE;
-    _pipe_regs_live.ID_EX._bypassSrc2 = BYPASS_SRC::NONE;
+#ifdef BYPASS_ENABLED
+    _pipe_regs_live.ID_EX._bypassSrc1 = NONE;
+    _pipe_regs_live.ID_EX._bypassSrc2 = NONE;
+#endif
 }
 
-void Mipc::killIF_ID(void) {
+void Mipc::killIF_ID(void)
+{
     _pipe_regs_live.IF_ID._ins = 0;
     _pipe_regs_live.IF_ID._pc = 0;
     _pipe_regs_copy.IF_ID._isNoOp = 1;
