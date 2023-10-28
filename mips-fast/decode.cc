@@ -21,13 +21,96 @@ void Decode::MainLoop(void)
         dataStalls = 0;
         // copy the IF_ID regs from pipeline reg
         _mc->_pipe_regs_copy.IF_ID = _mc->_pipe_regs_live.IF_ID;
+        _pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::NONE;
+        _pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::NONE;
 
         // need to stall at negedge if dependency found
         _mc->Dec(_mc->_pipe_regs_copy.IF_ID._ins);
 
-#ifdef BYPASS_ENABLED
+// #ifdef BYPASS_ENABLED
         printf("bypass enabled\n");
-#else
+        if (!_mc->_isIllegalOp)
+        {
+            if(!_mc->_isFloating) {
+                if(_mc->_regSRC1 != 0 && _mc->_regSRC1 != 100) {
+                    if(_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST){
+                        if(_mc->_pipe_regs_live.ID_EX._memControl) {
+                            // it is a load instruction, stall the pipe
+                            dataStalls = 1;
+                            // _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+                        }
+                        else {
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::EX;
+                        }
+                    }
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST){
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+                    }
+                }
+
+                if(_mc->_regSRC2 != 0 && _mc->_regSRC2 != 100) {
+                    if(_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST){
+                        if(_mc->_pipe_regs_live.ID_EX._memControl) {
+                            // it is a load instruction, stall the pipe
+                            dataStalls = 1;
+                            // _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::MEM;
+                        }
+                        else {
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::EX;
+                        }
+                    }
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST){
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::MEM;
+                    }
+                }
+            } else {
+                if(_mc->_regSRC1 != 100) {
+                    if(_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST) {
+                        if(_mc->_pipe_regs_live.ID_EX._memControl) {
+                            // it is a load instruction, stall the pipe
+                            dataStalls = 1;
+                            // _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+                        }
+                        else {
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::EX;
+                        }
+                    }
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST){
+                        _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+                    }
+                }
+
+                if(_mc->_regSRC2 != 100) {
+                    if(_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST) {
+                        if(_mc->_pipe_regs_live.ID_EX._memControl) {
+                            // it is a load instruction, stall the pipe
+                            dataStalls = 1;
+                            // _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::MEM;
+                        }
+                        else {
+                            _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::EX;
+                        }
+                    }
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST){
+                        _mc->pipe_regs_copy.IF_ID._bypassSrc2 = BYPASS_SRC::MEM;
+                    }
+                }
+            }
+
+            if(_mc->_readHi){
+                if(_mc->_pipe_regs_live.ID_EX._hiWPort)
+                    _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::EX;
+                else if(_mc->_pipe_regs_live.EX_MEM._hiWPort) 
+                    _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+            }
+            if(_mc->_readLo){
+                if(_mc->_pipe_regs_live.ID_EX._loWPort)
+                    _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::EX;
+                else if(_mc->_pipe_regs_live.EX_MEM._loWPort) 
+                    _mc->pipe_regs_copy.IF_ID._bypassSrc1 = BYPASS_SRC::MEM;
+            }
+        }
+// #else
         // check for interlock logic here
         // If source registers match for destination registers in last two instructions
         if (!_mc->_isIllegalOp)

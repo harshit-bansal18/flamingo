@@ -65,7 +65,9 @@ void Exe::MainLoop(void)
     while (1)
     {
         AWAIT_P_PHI0; // @posedge
+#ifdef BRANCH_INTERLOCK
         _mc->_isBranchInterlock = FALSE; // write in posedge, read in negedge (IF)
+#endif
         _mc->_pipe_regs_copy.ID_EX = _mc->_pipe_regs_live.ID_EX;
         ins = _mc->_pipe_regs_copy.ID_EX._ins;
         isSyscall = _mc->_pipe_regs_copy.ID_EX._isSyscall;
@@ -99,7 +101,10 @@ void Exe::MainLoop(void)
         {
             fprintf(_mc->_debugLog, "<%llu> btaken:%d isBranch: %d ins %#x\n", SIM_TIME, _mc->_pipe_regs_copy.ID_EX._isBranchIns, _mc->_btaken, ins);
 
+#ifdef BRANCH_INTERLOCK
             _mc->_isBranchInterlock = _mc->_pipe_regs_copy.ID_EX._isBranchIns;
+#endif
+
             if (_mc->_pipe_regs_copy.ID_EX._isBranchIns && _mc->_btaken)
             {
                 _mc->_pc = _mc->_pipe_regs_copy.ID_EX._btgt;

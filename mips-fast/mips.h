@@ -21,9 +21,18 @@ typedef unsigned Bool;
 
 #endif
 
+#define MIPC_DEBUG 1
+// #define BRANCH_INTERLOCK 1
+
 #include "mem.h"
 #include "../../common/syscall.h"
 #include "queue.h"
+
+enum BYPASS_SRC {
+    EX = 101,
+    MEM = 102,
+    NONE = 103
+};
 
 typedef struct
 {
@@ -49,7 +58,11 @@ typedef struct
     Bool _isBranchIns;
     Bool _isNoOp;
     Bool _isFloating;
+
+    BYPASS_SRC _bypassSrc1;
+    BYPASS_SRC _bypassSrc2;
 } regs;
+
 typedef struct
 {
     struct
@@ -64,8 +77,6 @@ typedef struct
     regs MEM_WB;
 
 } PipelineRegs;
-
-#define MIPC_DEBUG 1
 
 class Mipc : public SimObject
 {
@@ -134,7 +145,9 @@ public:
     PipelineRegs _pipe_regs_live;
     PipelineRegs _pipe_regs_copy;
     bool _stall;
+#ifdef BRANCH_INTERLOCK
     bool _isBranchInterlock;
+#endif
     unsigned int _stall_cycles;
     bool _syscall_in_pipe;
 

@@ -75,16 +75,19 @@ void Mipc::MainLoop(void)
             // data hazard stall
             if(_stall)
                 continue;
+#ifdef BRANCH_INTERLOCK
             if(_isBranchInterlock) {
                 killIF_ID();
                 continue;
             }
+#endif
             addr = _pc;
             ins = _mem->BEGetWord(addr, _mem->Read(addr & ~(LL)0x7));
 
             // forward the instruction to ID stage
             _pipe_regs_live.IF_ID._ins = ins;
             _pipe_regs_live.IF_ID._pc = _pc;
+
             _pc += 4; // ????
             _nfetched++;
 // #ifdef MIPC_DEBUG
@@ -183,7 +186,9 @@ void Mipc::Reboot(char *image)
         _btgt = 0xdeadbeef;
         _sim_exit = 0;
         _syscall_in_pipe = FALSE;
+#ifdef BRANCH_INTERLOCK
         _isBranchInterlock = FALSE;
+#endif
         _pipe_regs_live.ID_EX._isIllegalOp = FALSE;
         _pipe_regs_live.EX_MEM._isIllegalOp = FALSE;
         _pipe_regs_live.MEM_WB._isIllegalOp = FALSE;
@@ -249,6 +254,8 @@ void Mipc::killID_EX(void) {
     _pipe_regs_live.ID_EX._writeFREG = FALSE;
     _pipe_regs_live.ID_EX._writeREG = FALSE;
     _pipe_regs_live.ID_EX._memControl = FALSE;
+    _pipe_regs_live.ID_EX._bypassSrc1 = BYPASS_SRC::NONE;
+    _pipe_regs_live.ID_EX._bypassSrc2 = BYPASS_SRC::NONE;
 }
 
 void Mipc::killIF_ID(void) {

@@ -814,13 +814,15 @@ Mipc::func_divu (Mipc *mc, unsigned ins)
 
 void
 Mipc::func_mfhi (Mipc *mc, unsigned ins)
-{
+{  
+   // Change here, dont read from hi register. Read from bypass register
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_hi;
 }
 
 void
 Mipc::func_mflo (Mipc *mc, unsigned ins)
-{
+{  
+   // Change here, dont read from hi register. Read from bypass register
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_lo;
 }
 
@@ -1195,8 +1197,6 @@ Mipc::func_mfc1 (Mipc *mc, unsigned ins)
 {
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_copy.ID_EX._decodedSRC1;
 }
-
-
 
 void
 Mipc::mem_lb (Mipc *mc)
