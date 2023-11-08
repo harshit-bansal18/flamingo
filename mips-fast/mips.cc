@@ -7,14 +7,10 @@ Mipc::Mipc(Mem *m) : _l('M')
     _mem = m;
     _sys = new MipcSysCall(this); // Allocate syscall layer
 
-    printf("in mipc constructor\n");
-
-    _syscall_in_pipe = false;
-
-    // #ifdef MIPC_DEBUG
+    #ifdef MIPC_DEBUG
     _debugLog = fopen("mipc.debug", "w");
     assert(_debugLog != NULL);
-    // #endif
+    #endif
 
     Reboot(ParamGetString("Mipc.BootROM"));
 }
@@ -32,7 +28,6 @@ void Mipc::MainLoop(void)
 
     _nfetched = 0;
 
-    printf("starting fetch main loop..\n");
     while (!_sim_exit)
     {
         AWAIT_P_PHI0; // @posedge
@@ -104,7 +99,7 @@ void Mipc::MipcDumpstats()
 
 void Mipc::fake_syscall(unsigned int ins)
 {
-    _sys->pc = _pipe_regs_copy.MEM_WB._pc; // ??
+    _sys->pc = _pipe_regs_copy.MEM_WB._pc;
     _sys->quit = 0;
     _sys->EmulateSysCall();
     if (_sys->quit)

@@ -99,7 +99,6 @@ int main (int argc, char **argv)
   mem = new Memory(mh);
   wb = new Writeback(mh);
   
-  printf("creating sim tasks now...\n");
   SimCreateTask (mh, "FETCH");
   SimCreateTask (dec, "DECODE");
   SimCreateTask (exec, "EXE");

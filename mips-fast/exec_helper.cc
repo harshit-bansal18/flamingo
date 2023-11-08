@@ -696,9 +696,6 @@ void
 Mipc::func_add_addu (Mipc *mc, unsigned ins)
 {
    mc->_pipe_regs_copy.ID_EX._opResultLo = (unsigned)(mc->_pipe_regs_copy.ID_EX._decodedSRC1 + mc->_pipe_regs_copy.ID_EX._decodedSRC2);
-   //printf("Encountered unimplemented instruction: add or addu.\n");
-   // printf("You need to fill in func_add_addu in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
@@ -729,9 +726,6 @@ void
 Mipc::func_sllv (Mipc *mc, unsigned ins)
 {
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_copy.ID_EX._decodedSRC2 << (mc->_pipe_regs_copy.ID_EX._decodedSRC1 & 0x1f);
-   // printf("Encountered unimplemented instruction: sllv.\n");
-   // printf("You need to fill in func_sllv in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
@@ -838,8 +832,6 @@ Mipc::func_mfhi (Mipc *mc, unsigned ins)
         mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_hi;
         break;
     default:
-        printf("MC YE KAHA SE AA GYA\nFUCKKKKKKKKKKKKKKKKKKKKKKKKK\n");
-        exit(0);
         break;
     }
 #else
@@ -868,8 +860,6 @@ Mipc::func_mflo (Mipc *mc, unsigned ins)
         mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_lo;
         break;
     default:
-        printf("MC YE KAHA SE AA GYA\nFUCKKKKKKKKKKKKKKKKKKKKKKKKK\n");
-        exit(0);
         break;
     }
 #else
@@ -977,9 +967,6 @@ Mipc::func_addi_addiu (Mipc *mc, unsigned ins)
 {
    SIGN_EXTEND_IMM(mc->_pipe_regs_copy.ID_EX._decodedSRC2);
    mc->_pipe_regs_copy.ID_EX._opResultLo = (unsigned)(mc->_pipe_regs_copy.ID_EX._decodedSRC1 + mc->_pipe_regs_copy.ID_EX._decodedSRC2);
-   // printf("Encountered unimplemented instruction: addi or addiu.\n");
-   // printf("You need to fill in func_addi_addiu in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
@@ -992,18 +979,12 @@ void
 Mipc::func_lui (Mipc *mc, unsigned ins)
 {
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_copy.ID_EX._decodedSRC2 << 16;
-   // printf("Encountered unimplemented instruction: lui.\n");
-   // printf("You need to fill in func_lui in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
 Mipc::func_ori (Mipc *mc, unsigned ins)
 {
    mc->_pipe_regs_copy.ID_EX._opResultLo = mc->_pipe_regs_copy.ID_EX._decodedSRC1 | mc->_pipe_regs_copy.ID_EX._decodedSRC2;
-   //printf("Encountered unimplemented instruction: ori.\n");
-   // printf("You need to fill in func_ori in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
@@ -1041,9 +1022,6 @@ Mipc::func_beq (Mipc *mc, unsigned ins)
 {
    mc->_num_cond_br++;
    mc->_btaken = (mc->_pipe_regs_copy.ID_EX._decodedSRC1 == mc->_pipe_regs_copy.ID_EX._decodedSRC2) ? 1 : 0;
-   // printf("Encountered unimplemented instruction: beq.\n");
-   // printf("You need to fill in func_beq in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void
@@ -1164,9 +1142,6 @@ Mipc::func_lw (Mipc *mc, unsigned ins)
    mc->_num_load++;
    SIGN_EXTEND_IMM(mc->_pipe_regs_copy.ID_EX._decodedSRC2);
    mc->_pipe_regs_copy.ID_EX._MAR = (unsigned)(mc->_pipe_regs_copy.ID_EX._decodedSRC1 + mc->_pipe_regs_copy.ID_EX._decodedSRC2);
-   //printf("Encountered unimplemented instruction: lw.\n");
-   // printf("You need to fill in func_lw in exec_helper.cc to proceed forward.\n");
-   // exit(0);
 }
 
 void

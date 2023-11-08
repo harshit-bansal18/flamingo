@@ -40,7 +40,6 @@ void Exe::MainLoop(void)
             case NONE:
                 break;
             default:
-                printf("MAAAAAAAA *********\n");
                 exit(0);
                 break;
             }
@@ -58,7 +57,6 @@ void Exe::MainLoop(void)
             case NONE:
                 break;
             default:
-                printf("MAAAAAAAA *********\n");
                 exit(0);
                 break;
             }
