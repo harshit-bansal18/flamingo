@@ -14,8 +14,8 @@ void Decode::MainLoop(void)
     while (1)
     {
         AWAIT_P_PHI0; // @posedge
-        _mc->_regSRC1 = 100;
-        _mc->_regSRC2 = 100;
+        _mc->_rs = 100;
+        _mc->_rt = 100;
         _mc->_bd = 0;
         _mc->_stall = 0;
         dataStalls = 0;
@@ -26,16 +26,16 @@ void Decode::MainLoop(void)
         // need to stall at negedge if dependency found
         _mc->Dec(_mc->_pipe_regs_copy.IF_ID._ins);
 
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
         _mc->_pipe_regs_copy.IF_ID._bypassSrc2 = NONE;
         _mc->_pipe_regs_copy.IF_ID._bypassSrc1 = NONE;
         if (!_mc->_isIllegalOp)
         {
             if (!_mc->_isFloating)
             {
-                if (_mc->_regSRC1 != 0 && _mc->_regSRC1 != 100)
+                if (_mc->_rs != 0 && _mc->_rs != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_rs == _mc->_pipe_regs_live.ID_EX._decodedDST)
                     {
                         if (_mc->_pipe_regs_live.ID_EX._memControl)
                         {
@@ -48,15 +48,15 @@ void Decode::MainLoop(void)
                             _mc->_pipe_regs_copy.IF_ID._bypassSrc1 = EX;
                         }
                     }
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_rs == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                     {
                         _mc->_pipe_regs_copy.IF_ID._bypassSrc1 = MEM;
                     }
                 }
 
-                if (_mc->_regSRC2 != 0 && _mc->_regSRC2 != 100 && !_mc->_hasImm)
+                if (_mc->_rt != 0 && _mc->_rt != 100 && !_mc->_hasImm)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_rt == _mc->_pipe_regs_live.ID_EX._decodedDST)
                     {
                         if (_mc->_pipe_regs_live.ID_EX._memControl)
                         {
@@ -69,7 +69,7 @@ void Decode::MainLoop(void)
                             _mc->_pipe_regs_copy.IF_ID._bypassSrc2 = EX;
                         }
                     }
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_rt == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                     {
                         _mc->_pipe_regs_copy.IF_ID._bypassSrc2 = MEM;
                     }
@@ -77,9 +77,9 @@ void Decode::MainLoop(void)
             }
             else
             {
-                if (_mc->_regSRC1 != 100)
+                if (_mc->_rs != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_rs == _mc->_pipe_regs_live.ID_EX._decodedDST)
                     {
                         if (_mc->_pipe_regs_live.ID_EX._memControl)
                         {
@@ -92,15 +92,15 @@ void Decode::MainLoop(void)
                             _mc->_pipe_regs_copy.IF_ID._bypassSrc1 = EX;
                         }
                     }
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_rs == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                     {
                         _mc->_pipe_regs_copy.IF_ID._bypassSrc1 = MEM;
                     }
                 }
 
-                if (_mc->_regSRC2 != 100)
+                if (_mc->_rt != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_rt == _mc->_pipe_regs_live.ID_EX._decodedDST)
                     {
                         if (_mc->_pipe_regs_live.ID_EX._memControl)
                         {
@@ -113,7 +113,7 @@ void Decode::MainLoop(void)
                             _mc->_pipe_regs_copy.IF_ID._bypassSrc2 = EX;
                         }
                     }
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_rt == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                     {
                         _mc->_pipe_regs_copy.IF_ID._bypassSrc2 = MEM;
                     }
@@ -142,35 +142,35 @@ void Decode::MainLoop(void)
         {
             if (!_mc->_isFloating)
             {
-                if (_mc->_regSRC1 != 0 && _mc->_regSRC1 != 100)
+                if (_mc->_rs != 0 && _mc->_rs != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_rs == _mc->_pipe_regs_live.ID_EX._decodedDST)
                         dataStalls = 1;
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_rs == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                         dataStalls = 1;
                 }
-                if (_mc->_regSRC2 != 0 && _mc->_regSRC2 != 100)
+                if (_mc->_rt != 0 && _mc->_rt != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeREG && _mc->_rt == _mc->_pipe_regs_live.ID_EX._decodedDST)
                         dataStalls = 1;
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeREG && _mc->_rt == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                         dataStalls = 1;
                 }
             }
             else
             {
-                if (_mc->_regSRC1 != 100)
+                if (_mc->_rs != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_rs == _mc->_pipe_regs_live.ID_EX._decodedDST)
                         dataStalls = 1;
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC1 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_rs == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                         dataStalls = 1;
                 }
-                if (_mc->_regSRC2 != 100)
+                if (_mc->_rt != 100)
                 {
-                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.ID_EX._decodedDST)
+                    if (_mc->_pipe_regs_live.ID_EX._writeFREG && _mc->_rt == _mc->_pipe_regs_live.ID_EX._decodedDST)
                         dataStalls = 1;
-                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_regSRC2 == _mc->_pipe_regs_live.EX_MEM._decodedDST)
+                    else if (_mc->_pipe_regs_live.EX_MEM._writeFREG && _mc->_rt == _mc->_pipe_regs_live.EX_MEM._decodedDST)
                         dataStalls = 1;
                 }
             }
@@ -218,12 +218,12 @@ void Decode::MainLoop(void)
             _mc->_pipe_regs_live.ID_EX._memControl = _mc->_memControl;
             _mc->_pipe_regs_live.ID_EX._writeFREG = _mc->_writeFREG;
             _mc->_pipe_regs_live.ID_EX._writeREG = _mc->_writeREG;
-            _mc->_pipe_regs_live.ID_EX._rs = _mc->_regSRC1;
-            _mc->_pipe_regs_live.ID_EX._rt = _mc->_regSRC2;
+            _mc->_pipe_regs_live.ID_EX._rs = _mc->_rs;
+            _mc->_pipe_regs_live.ID_EX._rt = _mc->_rt;
             _mc->_pipe_regs_live.ID_EX._isBranchIns = _mc->_bd;
             _mc->_pipe_regs_live.ID_EX._btgt = _mc->_btgt;
             _mc->_pipe_regs_live.ID_EX._isFloating = _mc->_isFloating;
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
             _mc->_pipe_regs_live.ID_EX._bypassSrc1 = _mc->_pipe_regs_copy.IF_ID._bypassSrc1;
             _mc->_pipe_regs_live.ID_EX._bypassSrc2 = _mc->_pipe_regs_copy.IF_ID._bypassSrc2;
 #endif

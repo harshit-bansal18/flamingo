@@ -40,8 +40,8 @@ Mipc::Dec (unsigned int ins)
       // SPECIAL (ALU format)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = _gpr[i.reg.rt];
-      _regSRC1 = i.reg.rs;
-      _regSRC2 = i.reg.rt;
+      _rs = i.reg.rs;
+      _rt = i.reg.rt;
       _decodedDST = i.reg.rd;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -208,7 +208,7 @@ Mipc::Dec (unsigned int ins)
       // ignore overflow: no exceptions
       _opControl = func_addi_addiu;
       _decodedSRC1 = _gpr[i.imm.rs];
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
       _writeREG = TRUE;
@@ -221,7 +221,7 @@ Mipc::Dec (unsigned int ins)
    case 0xc:			// andi
       _opControl = func_andi;
       _decodedSRC1 = _gpr[i.imm.rs];
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
       _writeREG = TRUE;
@@ -247,7 +247,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.imm.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -260,7 +260,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.imm.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -273,7 +273,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.imm.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -286,7 +286,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.imm.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.imm.rt;
-      _regSRC1 = i.imm.rs;
+      _rs = i.imm.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -298,8 +298,8 @@ Mipc::Dec (unsigned int ins)
       _opControl = func_beq;
       _decodedSRC1 = _gpr[i.imm.rs];
       _decodedSRC2 = _gpr[i.imm.rt];
-      _regSRC1 = i.imm.rs;
-      _regSRC2 = i.imm.rt;
+      _rs = i.imm.rs;
+      _rt = i.imm.rt;
       _branchOffset = i.imm.imm;
       _writeREG = FALSE;
       _writeFREG = FALSE;
@@ -312,7 +312,7 @@ Mipc::Dec (unsigned int ins)
    case 1:
       // REGIMM
       _decodedSRC1 = _gpr[i.reg.rs];
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _branchOffset = i.imm.imm;
       _writeREG = FALSE;
       _writeFREG = FALSE;
@@ -354,7 +354,7 @@ Mipc::Dec (unsigned int ins)
    case 7:			// bgtz
       _opControl = func_bgtz;
       _decodedSRC1 = _gpr[i.reg.rs];
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _branchOffset = i.imm.imm;
       _writeREG = FALSE;
       _writeFREG = FALSE;
@@ -367,7 +367,7 @@ Mipc::Dec (unsigned int ins)
    case 6:			// blez
       _opControl = func_blez;
       _decodedSRC1 = _gpr[i.reg.rs];
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _branchOffset = i.imm.imm;
       _writeREG = FALSE;
       _writeFREG = FALSE;
@@ -381,8 +381,8 @@ Mipc::Dec (unsigned int ins)
       _opControl = func_bne;
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = _gpr[i.reg.rt];
-      _regSRC1 = i.reg.rs;
-      _regSRC2 = i.reg.rt;
+      _rs = i.reg.rs;
+      _rt = i.reg.rt;
       _branchOffset = i.imm.imm;
       _writeREG = FALSE;
       _writeFREG = FALSE;
@@ -422,7 +422,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -436,7 +436,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = TRUE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -450,7 +450,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -465,7 +465,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -481,8 +481,8 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _subregOperand = _gpr[i.reg.rt];
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
-      _regSRC2 = i.reg.rt;
+      _rs = i.reg.rs;
+      _rt = i.reg.rt;
       _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -497,7 +497,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -513,8 +513,8 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC2 = i.imm.imm;
       _subregOperand = _gpr[i.reg.rt];
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
-      _regSRC2 = i.reg.rt;
+      _rs = i.reg.rs;
+      _rt = i.reg.rt;
       _hasImm = TRUE;
       _writeREG = TRUE;
       _writeFREG = FALSE;
@@ -529,7 +529,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _hasImm = TRUE;
       _writeREG = FALSE;
       _writeFREG = TRUE;
@@ -544,7 +544,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -558,7 +558,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -572,7 +572,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -586,7 +586,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -600,7 +600,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -614,7 +614,7 @@ Mipc::Dec (unsigned int ins)
       _decodedSRC1 = _gpr[i.reg.rs];
       _decodedSRC2 = i.imm.imm;
       _decodedDST = i.reg.rt;
-      _regSRC1 = i.reg.rs;
+      _rs = i.reg.rs;
       _writeREG = FALSE;
       _writeFREG = FALSE;
       _hiWPort = FALSE;
@@ -629,7 +629,7 @@ Mipc::Dec (unsigned int ins)
          _opControl = func_mtc1;
          _decodedSRC1 = _gpr[i.freg.ft];
          _decodedDST = i.freg.fs;
-         _regSRC1 = i.freg.ft;
+         _rs = i.freg.ft;
          _writeREG = FALSE;
          _writeFREG = TRUE;
          _hiWPort = FALSE;
@@ -642,7 +642,7 @@ Mipc::Dec (unsigned int ins)
          _decodedSRC1 = _fpr[(i.freg.fs)>>1].l[FP_TWIDDLE^((i.freg.fs)&1)];
          _decodedDST = i.freg.ft;
          _isFloating = TRUE;
-         _regSRC1 = i.freg.fs;
+         _rs = i.freg.fs;
          _writeREG = TRUE;
          _writeFREG = FALSE;
          _hiWPort = FALSE;
@@ -816,7 +816,7 @@ void
 Mipc::func_mfhi (Mipc *mc, unsigned ins)
 {  
    // Change here, dont read from hi register. Read from bypass register
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
    switch (mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
     {
     case EX:
@@ -843,8 +843,8 @@ Mipc::func_mfhi (Mipc *mc, unsigned ins)
 void
 Mipc::func_mflo (Mipc *mc, unsigned ins)
 {  
-   // Change here, dont read from hi register. Read from bypass register
-#ifdef BYPASS_ENABLED
+   // Change here, dont read from lo register. Read from bypass register
+#ifdef ENABLE_BYPASS
    switch (mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
     {
     case EX:

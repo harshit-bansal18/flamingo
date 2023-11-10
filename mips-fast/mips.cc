@@ -42,7 +42,7 @@ void Mipc::MainLoop(void)
         {
             if (_stall)
                 continue;
-#ifdef BRANCH_INTERLOCK
+#ifdef STALL_ON_BRANCH
             if (_isBranchInterlock)
             {
                 killIF_ID();
@@ -155,7 +155,7 @@ void Mipc::Reboot(char *image)
         _sim_exit = 0;
         _syscall_in_pipe = FALSE;
         _hasImm = FALSE;
-#ifdef BRANCH_INTERLOCK
+#ifdef STALL_ON_BRANCH
         _isBranchInterlock = FALSE;
 #endif
         _pipe_regs_live.ID_EX._isIllegalOp = FALSE;
@@ -226,7 +226,7 @@ void Mipc::killID_EX(void)
     _pipe_regs_live.ID_EX._writeFREG = FALSE;
     _pipe_regs_live.ID_EX._writeREG = FALSE;
     _pipe_regs_live.ID_EX._memControl = FALSE;
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
     _pipe_regs_live.ID_EX._bypassSrc1 = NONE;
     _pipe_regs_live.ID_EX._bypassSrc2 = NONE;
 #endif

@@ -15,7 +15,7 @@ void Exe::MainLoop(void)
     while (1)
     {
         AWAIT_P_PHI0; // @posedge
-#ifdef BRANCH_INTERLOCK
+#ifdef STALL_ON_BRANCH
         _mc->_isBranchInterlock = FALSE; // write in posedge, read in negedge (IF)
 #endif
         _mc->_pipe_regs_copy.ID_EX = _mc->_pipe_regs_live.ID_EX;
@@ -25,7 +25,7 @@ void Exe::MainLoop(void)
 
         if (!isIllegalOp && !isSyscall && _mc->_pipe_regs_copy.ID_EX._opControl)
         {
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
             switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
             {
             case EX:
@@ -40,7 +40,6 @@ void Exe::MainLoop(void)
             case NONE:
                 break;
             default:
-                exit(0);
                 break;
             }
             switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc2 )
@@ -57,7 +56,6 @@ void Exe::MainLoop(void)
             case NONE:
                 break;
             default:
-                exit(0);
                 break;
             }
             
@@ -84,7 +82,7 @@ void Exe::MainLoop(void)
         {
             fprintf(_mc->_debugLog, "<%llu> btaken:%d isBranch: %d ins %#x btgt: %#x\n", SIM_TIME, _mc->_pipe_regs_copy.ID_EX._isBranchIns, _mc->_btaken, ins, _mc->_pipe_regs_copy.ID_EX._btgt);
 
-#ifdef BRANCH_INTERLOCK
+#ifdef STALL_ON_BRANCH
             _mc->_isBranchInterlock = _mc->_pipe_regs_copy.ID_EX._isBranchIns;
 #endif
 

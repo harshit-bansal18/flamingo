@@ -22,16 +22,16 @@ typedef unsigned Bool;
 #endif
 
 #define MIPC_DEBUG 1
-// #define BRANCH_INTERLOCK 1
+// #define STALL_ON_BRANCH 1
 
-#define BYPASS_ENABLED 1
+#define ENABLE_BYPASS 1
 
 #include "mem.h"
 #include "../../common/syscall.h"
 #include "queue.h"
 
 
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
 typedef enum {
     EX = 101,
     MEM = 102,
@@ -64,7 +64,7 @@ typedef struct
     Bool _isNoOp;
     Bool _isFloating;
 
-#ifdef BYPASS_ENABLED
+#ifdef ENABLE_BYPASS
     BYPASS_SRC _bypassSrc1;
     BYPASS_SRC _bypassSrc2;
 #endif
@@ -143,11 +143,11 @@ public:
 
 
     // Pipeline State
-    unsigned _regSRC1, _regSRC2;
+    unsigned _rs, _rt;
     PipelineRegs _pipe_regs_live;
     PipelineRegs _pipe_regs_copy;
     bool _stall;
-#ifdef BRANCH_INTERLOCK
+#ifdef STALL_ON_BRANCH
     bool _isBranchInterlock;
 #endif
     unsigned int _stall_cycles;
