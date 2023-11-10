@@ -42,7 +42,7 @@ void Writeback::MainLoop(void)
 #endif
             _mc->_pipe_regs_copy.MEM_WB._opControl(_mc, ins);
             _mc->_pc = _mc->_pipe_regs_copy.MEM_WB._pc + 4;
-            _mc->_syscall_in_pipe = FALSE; // update at posedge. 
+            _mc->_executing_syscall = FALSE; // update at posedge. 
         }
         else if (isIllegalOp)
         {

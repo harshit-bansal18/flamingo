@@ -26,15 +26,19 @@ void Exe::MainLoop(void)
         if (!isIllegalOp && !isSyscall && _mc->_pipe_regs_copy.ID_EX._opControl)
         {
 #ifdef ENABLE_BYPASS
-            switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc1 )
+            switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc1)
             {
             case EX:
-                /* code */
+/* code */
+#ifdef MIPC_DEBUG
                 fprintf(_mc->_debugLog, "bypassing %#x from EX to src1 for ins %#x\n", _mc->_pipe_regs_live.EX_MEM._opResultLo, ins);
+#endif
                 _mc->_pipe_regs_copy.ID_EX._decodedSRC1 = _mc->_pipe_regs_live.EX_MEM._opResultLo;
                 break;
             case MEM:
+#ifdef MIPC_DEBUG
                 fprintf(_mc->_debugLog, "bypassing %#x from MEM to src1 for ins %#x\n", _mc->_pipe_regs_live.MEM_WB._opResultLo, ins);
+#endif
                 _mc->_pipe_regs_copy.ID_EX._decodedSRC1 = _mc->_pipe_regs_live.MEM_WB._opResultLo;
                 break;
             case NONE:
@@ -42,15 +46,19 @@ void Exe::MainLoop(void)
             default:
                 break;
             }
-            switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc2 )
+            switch (_mc->_pipe_regs_copy.ID_EX._bypassSrc2)
             {
             case EX:
-                /* code */
+/* code */
+#ifdef MIPC_DEBUG
                 fprintf(_mc->_debugLog, "bypassing %#x from EX to src2 for ins %#x\n", _mc->_pipe_regs_live.EX_MEM._opResultLo, ins);
+#endif
                 _mc->_pipe_regs_copy.ID_EX._decodedSRC2 = _mc->_pipe_regs_live.EX_MEM._opResultLo;
                 break;
             case MEM:
+#ifdef MIPC_DEBUG
                 fprintf(_mc->_debugLog, "bypassing %#x from MEM to src2 for ins %#x\n", _mc->_pipe_regs_live.MEM_WB._opResultLo, ins);
+#endif
                 _mc->_pipe_regs_copy.ID_EX._decodedSRC2 = _mc->_pipe_regs_live.MEM_WB._opResultLo;
                 break;
             case NONE:
@@ -58,7 +66,7 @@ void Exe::MainLoop(void)
             default:
                 break;
             }
-            
+
 #endif
             _mc->_pipe_regs_copy.ID_EX._opControl(_mc, ins);
 #ifdef MIPC_DEBUG
@@ -80,14 +88,12 @@ void Exe::MainLoop(void)
 
         if (!isIllegalOp && !isSyscall)
         {
-            fprintf(_mc->_debugLog, "<%llu> btaken:%d isBranch: %d ins %#x btgt: %#x\n", SIM_TIME, _mc->_pipe_regs_copy.ID_EX._isBranchIns, _mc->_btaken, ins, _mc->_pipe_regs_copy.ID_EX._btgt);
-
 #ifdef STALL_ON_BRANCH
             _mc->_isBranchInterlock = _mc->_pipe_regs_copy.ID_EX._isBranchIns;
 #endif
 
             if (_mc->_pipe_regs_copy.ID_EX._isBranchIns && _mc->_btaken)
-            {                
+            {
                 _mc->_pc = _mc->_pipe_regs_copy.ID_EX._btgt;
             }
         }

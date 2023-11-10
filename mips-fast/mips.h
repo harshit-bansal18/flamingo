@@ -22,9 +22,10 @@ typedef unsigned Bool;
 #endif
 
 #define MIPC_DEBUG 1
-// #define STALL_ON_BRANCH 1
+#define STALL_ON_BRANCH 1
 
-#define ENABLE_BYPASS 1
+// #define ENABLE_BYPASS 1
+// #define BYPASS_LVL 1
 
 #include "mem.h"
 #include "../../common/syscall.h"
@@ -151,7 +152,7 @@ public:
     bool _isBranchInterlock;
 #endif
     unsigned int _stall_cycles;
-    bool _syscall_in_pipe;
+    bool _executing_syscall;
 
 
     void killID_EX();
@@ -172,6 +173,7 @@ public:
     LL _num_load;
     LL _num_store;
     LL _fpinst;
+    LL _num_load_stall;
 
     Mem *_mem; // attached memory (not a cache)
 

@@ -7,10 +7,10 @@ Mipc::Mipc(Mem *m) : _l('M')
     _mem = m;
     _sys = new MipcSysCall(this); // Allocate syscall layer
 
-    #ifdef MIPC_DEBUG
+#ifdef MIPC_DEBUG
     _debugLog = fopen("mipc.debug", "w");
     assert(_debugLog != NULL);
-    #endif
+#endif
 
     Reboot(ParamGetString("Mipc.BootROM"));
 }
@@ -33,7 +33,7 @@ void Mipc::MainLoop(void)
         AWAIT_P_PHI0; // @posedge
         // fetch at negegde
         AWAIT_P_PHI1; // @negedge
-        if (_syscall_in_pipe)
+        if (_executing_syscall)
         {
             killIF_ID();
             continue;
@@ -83,9 +83,9 @@ void Mipc::MipcDumpstats()
     l.print("");
     l.print("************************************************************");
     l.print("");
-    l.print("Number of instructions: %llu", _nfetched);
+    l.print("Number of instructions: %llu", _nfetched - 1);
     l.print("Number of simulated cycles: %llu", SIM_TIME);
-    l.print("CPI: %.2f", ((double)SIM_TIME) / _nfetched);
+    l.print("CPI: %.2f", ((double)SIM_TIME) / (_nfetched - 1));
     l.print("Int Conditional Branches: %llu", _num_cond_br);
     l.print("Jump and Link: %llu", _num_jal);
     l.print("Jump Register: %llu", _num_jr);
@@ -94,6 +94,7 @@ void Mipc::MipcDumpstats()
     l.print("Number of syscall emulated loads: %llu", _sys->_num_load);
     l.print("Number of stores: %llu", _num_store);
     l.print("Number of syscall emulated stores: %llu", _sys->_num_store);
+    l.print("Number of load stalls: %llu", _num_load_stall);
     l.print("");
 }
 
@@ -147,13 +148,14 @@ void Mipc::Reboot(char *image)
         _num_cond_br = 0;
         _num_jal = 0;
         _num_jr = 0;
+        _num_load_stall = 0;
 
         _lastbd = 0;
         _bd = 0;
         _btaken = 0;
         _btgt = 0xdeadbeef;
         _sim_exit = 0;
-        _syscall_in_pipe = FALSE;
+        _executing_syscall = FALSE;
         _hasImm = FALSE;
 #ifdef STALL_ON_BRANCH
         _isBranchInterlock = FALSE;
@@ -161,9 +163,11 @@ void Mipc::Reboot(char *image)
         _pipe_regs_live.ID_EX._isIllegalOp = FALSE;
         _pipe_regs_live.EX_MEM._isIllegalOp = FALSE;
         _pipe_regs_live.MEM_WB._isIllegalOp = FALSE;
+#ifdef ENABLE_BYPASS
         _pipe_regs_live.ID_EX._bypassSrc1 = NONE;
         _pipe_regs_live.EX_MEM._bypassSrc1 = NONE;
         _pipe_regs_live.MEM_WB._bypassSrc1 = NONE;
+#endif
         _pc = ParamGetInt("Mipc.BootPC"); // Boom! GO
     }
 }
